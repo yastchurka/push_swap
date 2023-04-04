@@ -6,12 +6,12 @@ struct node { //change name to sth else
 	struct node *link;
 };
 
-void	add_at_the_end(struct node *head, int data)
+void	add_at_the_bottom(struct node **head, int data)
 {
 	struct node *ptr;
 	struct node *temp;
 
-	ptr = head;
+	ptr = *head;
 	temp = malloc(sizeof(struct node));
 	temp->data = data;
 	temp->link = NULL;
@@ -19,6 +19,36 @@ void	add_at_the_end(struct node *head, int data)
 		ptr = ptr->link;
 	ptr->link = temp;
 }
+
+void	add_at_the_top(struct node **head, int data) 
+{
+    struct node *new_node; 
+	
+	new_node = malloc(sizeof(struct node));
+    new_node->data = data;
+    new_node->link = *head;
+    *head = new_node;
+}
+
+//deletes the top element of the stack and returnes it
+int pop(struct node **head_of_stack)
+{
+	struct	node *temp;
+	int		x;
+	
+	x = 0;
+	if (!(*head_of_stack))
+		return (-1); //change error message
+	else
+	{
+		temp = *head_of_stack;
+		x = (*head_of_stack)->data;
+		*head_of_stack = (*head_of_stack)->link;
+		free(temp); 
+		temp = NULL;
+	}
+	return (x);
+} 
 
 /* sa (swap a): Swap the first 2 elements at the top of stack a.
 Do nothing if there is only one or no elements */
@@ -37,17 +67,7 @@ void	sa(struct node *head)
 
 /* pb (push b): Take the first element at the top of a and put it at the top of b.
 Do nothing if a is empty. */
-void	pb(struct node *head_of_stack1, struct node *head_of_stack2)
+int	pb(struct node **head_of_stack1, struct node **head_of_stack2)
 {
-	int	temp_value;
-	struct node *ptr;
-	
-	if (!head_of_stack1 || !head_of_stack1->link || !head_of_stack2)
-		return ; // ERROR message, declare in .h
-	temp_value = head_of_stack1->data;
-	head_of_stack2->data = temp_value;
-	ptr = head_of_stack1;
-	head_of_stack1->link = head_of_stack1->link->link;
-	free(ptr);
-	ptr = NULL;
+
 }

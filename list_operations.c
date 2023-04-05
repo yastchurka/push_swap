@@ -44,7 +44,7 @@ int pop(struct node **head_of_stack)
 		temp = *head_of_stack;
 		x = (*head_of_stack)->data;
 		*head_of_stack = (*head_of_stack)->link;
-		free(temp); 
+		//free(temp); 
 		temp = NULL;
 	}
 	return (x);
@@ -69,5 +69,6 @@ void	sa(struct node *head)
 Do nothing if a is empty. */
 int	pb(struct node **head_of_stack1, struct node **head_of_stack2)
 {
-
+	int x = pop(head_of_stack1);
+	add_at_the_top(head_of_stack2, x);
 }

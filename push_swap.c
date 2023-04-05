@@ -3,6 +3,7 @@
 
 struct node { //change name to sth else
 	int		data;
+	int		index;
 	struct	node *link;
 };
 
@@ -18,7 +19,7 @@ int 	pop(struct node **head_of_stack);
 //PRINTING CONTENT, JUST FOR TESTING
 int	ft_print_content(struct node *head)
 {
-	struct node *ptr = NULL;
+	struct node *ptr;
 	ptr = head;
 	while(ptr != NULL)
 	{
@@ -48,8 +49,8 @@ void initiate_new_lists(struct node *head_of_stack1, int argc, char **argv)
 		printf("%d", ft_atoi(argv[1]));
 }
 
-/* We want to make pop work */
-//deletes the top element of the stack and returnes it
+/* !there's a 0 initiated int he stack2, how to remove it? */
+/* calculate negative numbers */
 int	main(int argc, char **argv)
 {
 	struct node *head_stack1;
@@ -60,6 +61,10 @@ int	main(int argc, char **argv)
 	head_stack1 = malloc(sizeof(struct node));
 	head_stack2 = malloc(sizeof(struct node));
 	initiate_new_lists(head_stack1, argc, argv);
+
+
+
+
 // --------- TESTING
 	printf("Starting point of stack1: \n");
 	ft_print_content(head_stack1); // that's just for us to see the input/output;
@@ -72,6 +77,13 @@ int	main(int argc, char **argv)
 	printf("Stack1 after pop: \n");
 	ft_print_content(head_stack1);
 	printf("-------------------------\n");
+	printf("Stack1 after pb: \n");
+	pb(&head_stack1, &head_stack2);
+	pb(&head_stack1, &head_stack2);
+	pb(&head_stack1, &head_stack2);
+	ft_print_content(head_stack1);
+	printf("Stack2 after pb: \n");
+	ft_print_content(head_stack2);
 // --------- TESTING
     return (0);
 }

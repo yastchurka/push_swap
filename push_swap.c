@@ -1,124 +1,277 @@
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-struct node { //change name to sth else
-	int				data;
-	int				index;
-	struct	node	*link;
-};
+typedef struct node {
+	int			value;
+	struct node	*next;
+	struct node	*prev;
+} nodek_t;
 
-/* this needs to go to the .h file */
-// FUNCTIONS PROTOTYPES
-void	add_at_the_bottom(struct node **head, int data);
-void	sa(struct node *head);
-void	sb(struct node *head);
-void	ss(struct node *head1, struct node *head2);
-int		pb(struct node **head_of_stack1, struct node **head_of_stack2);
-int		pa(struct node **head_of_stack1, struct node **head_of_stack2);
-void	ra(struct node **head);
-void	rb(struct node **head);
-void	rr(struct node *head1, struct node *head2);
-int		rra(struct node **head);
-int		rrb(struct node **head);
-void	rrr(struct node *head1, struct node *head2);
-int 	ft_atoi(char argv[]);
-int 	pop(struct node **head_of_stack);
-/* TESTING ENVIRONMENT */
-int sort(struct node **head1);
-
-//PRINTING CONTENT, JUST FOR TESTING
-int	ft_print_content(struct node *head)
+int	small_atoi(char *str)
 {
-	struct node *ptr;
-	ptr = head;
-	while(ptr != NULL)
+	int neg;
+	int num;
+	int i;
+
+	i = 0;
+	neg = 1;
+	num = 0;
+ 	while (str[i] <= ' ')
+		i++;
+	if (str[i] == '-' || str[i] == '+')
 	{
-		printf("%d\n", ptr->data); //we can't use printf
-		ptr = ptr->link;
+		if (str[i] == '-')
+		{
+			neg *= -1;
+		}
+		i++;
 	}
-	return 0;
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		num = num * 10 + (str[i] - 48);
+		i++;
+	}
+	return (num * neg);
 }
 
-void initiate_new_lists(struct node *head_of_stack1, int argc, char **argv)
+struct node *find_last_node(struct node *node)
 {
-	struct node *new;
+	struct node	*temp;
 
-	int	i;
-	if (argc >= 3)
+	temp = node;
+	if (temp == NULL)
+		return (NULL);
+	while (temp->next)
+		temp = temp->next;
+	return(temp);
+}
+
+void    append_node(struct node **stack, int nbr)
+{
+	struct node *node;
+	struct node *last_node;
+
+	if (stack == NULL)
+		return ;
+	node = malloc(sizeof(struct node));
+	if (node == NULL)
+		return ;
+	node->next = NULL;
+	node->value = nbr;
+	if (*stack == NULL)
 	{
-		i = 2;
-		head_of_stack1->data = ft_atoi(argv[1]);
-		head_of_stack1->link = NULL;
-		while(argv[i])
-		{
-			add_at_the_bottom(&head_of_stack1, ft_atoi(argv[i]));
-			i++;
-		}
+		*stack = node;
+		node->prev = NULL;
 	}
 	else
-		printf("%d", ft_atoi(argv[1]));
+	{
+		last_node = find_last_node(*stack);
+		last_node->next = node;
+		node->prev = last_node;
+	}
 }
 
-/* !there's a 0 initiated in the stack2, how to remove it? */
-/* calculate negative numbers */
-int	main(int argc, char **argv)
+void    initiate_stack(struct node **a, char *argv[])
 {
-	struct node *head_stack1;
-	struct node *head_stack2;
+	int	i;
+	int	nb;
 
-	if (argc < 2)
-		return (-1);
-	head_stack1 = malloc(sizeof(struct node));
-	head_stack2 = malloc(sizeof(struct node));
-	initiate_new_lists(head_stack1, argc, argv);
-	// TESTING:
+	i = 0;
+	nb = 0;
+	//if (nbr > INT_MAX || nbr < INT_MIN)
+	//if (error_repetition(*a, (int)nbr))
+	while (argv[i])
+	{
+		nb = small_atoi(argv[i]);
+		append_node(a, nb);
+		i++;
+	}
+}
+
+static void	push(struct node **stack_a, struct node **stack_b)
+{
+	struct node	*temp;
+
+	if (NULL == *stack_a)
+		return ;
+	temp = *stack_a;
+	*stack_a = (*stack_a)->next;
+	if (*stack_a)
+		(*stack_a)->prev = NULL;
+	temp->prev = NULL;
+	if (NULL == *stack_b)
+	{
+		*stack_b = temp;
+		temp->next = NULL;
+	}
+	else
+	{
+		temp->next = *stack_b;
+		temp->next->prev = temp;
+		*stack_b = temp;
+	}
+}
+
+void	pa(struct node **a, struct node **b)
+{
+	push(b, a);
+	write(1, "pa\n", 3);
+}
+
+void	pb(struct node **a, struct node **b)
+{
+	push(a, b);
+	write(1, "pb\n", 3);
+}
+
+void	rotate(struct node **stack)
+{
+	struct node	*temp;
+
+	//possible better error handling
+	if (NULL == *stack)
+		return ;
+	temp = find_last_node(*stack);
+	temp->next = *stack;
+	*stack = (*stack)->next;
+	(*stack)->prev = NULL;
+	temp->next->prev = temp;
+	temp->next->next = NULL;
+	write(1, "ra\n", 3);
+}
+
+int	len(struct node **stack)
+{
+	struct node	*temp;
+	int			i;
+
+	temp = *stack;
+	i = 0;
+	//fix error handling 
+	if (!stack)
+		return (0);
+	while (temp)
+	{
+		i++;
+		temp = temp->next;
+	}
+	return (i);
+}
+
+static int	countBits(struct node **stack) 
+{
+	struct node		*temp;
+	int			count;
+	int			bit_counter;
+
+	temp = *stack;
+	count = (*stack)->value;
+	bit_counter = 0;
+	while (temp)
+	{
+		if (temp->value > count)
+			count = temp->value;
+		temp = temp->next;
+	}
+	while ((count >> bit_counter) != 0) 
+		bit_counter++; 
+	return (bit_counter);
+}
+
+void	radix_sort(struct node **stack_a, struct node **stack_b)
+{
+	struct node	*head;
+	int			max_bits;
+	int			size;
+	int			i;
+	int 		j;
+
+	i = 0;
+	max_bits = countBits(stack_a);
+	size = len(stack_a);
+	head = *stack_a;
+	while (i < max_bits)
+	{
+		j = 0;
+		while (j < size)
+		{
+			head = *stack_a;
+			if (((head->value >> i) & 1 ) == 1)
+				rotate(stack_a);
+			else
+				pb(stack_a, stack_b);
+			j++;
+		}
+		while (len(stack_b) != 0)
+			pa(stack_a, stack_b); 
+		i++;
+	} 
+}
+
+int	is_sorted(struct node **stack_a)
+{
+	struct node	*temp;
+
+	temp = *stack_a;
+	while (temp->next)
+	{
+		if (temp->value > temp->next->value)
+			return (0);
+		temp = temp->next;
+	}
+	return (1);
+}
+
+void	sorting(struct node **stack_a, struct node **stack_b, int argc)
+{
+	if (argc == 2)
+		rotate(stack_a);
+	if (argc == 3)
+		sort_3(stack_a, stack_b);
+	if (argc == 3)
+		sort_4(stack_a, stack_b);
+	if (argc == 3)
+		sort_5(stack_a, stack_b);
+	else
+		radix_sort(stack_a, stack_b);
+}
+
+int	main(int argc, char *argv[])
+{
+	struct node	*a;
+	struct node *b;
+
+	a = NULL;
+	b = NULL;
+	if (argc == 1 || (argc == 2 && !argc[1][0]))
+		return (1);
+	else if (argc == 2)
+		argv = ft_split(argv[1], ' ');
+	initiate_stack(&a, argv + 1);
+	if (is_sorted(&a) == 0)
+	{
+		sorting(&a, &b, argc);
+		return (0);
+	}
+	//free_a
 	
-
-
-// TEST: rr, rrr
-// --------- TESTING
- 	printf("Starting point of stack1: \n");
-	ft_print_content(head_stack1);
-	printf("-------------------------\n");
-	sort(&head_stack1);
-	ft_print_content(head_stack1);
-	/* printf("Stack1 after sa: \n");
-	sa(head_stack1);
-	ft_print_content(head_stack1);
-	printf("-------------------------\n");
-	printf("Stack1 after pb pb pb: \n");
-	pb(&head_stack1, &head_stack2);
-	pb(&head_stack1, &head_stack2);
-	pb(&head_stack1, &head_stack2);
-	ft_print_content(head_stack1);
-	printf("Stack2 after pb: \n");
-	ft_print_content(head_stack2);
-	printf("-------------------------\n");
-	printf("Stack1 after ss: \n");
-	ss(head_stack1, head_stack2);
-	ft_print_content(head_stack1);
-	printf("Stack2 after ss: \n");
-	ft_print_content(head_stack2);
-	printf("-------------------------\n");
-	printf("Stack1 after pa: \n");
-	pa(&head_stack1, &head_stack2);
-	ft_print_content(head_stack1);
-	printf("Stack2 after pa: \n");
-	ft_print_content(head_stack2);
-	printf("-------------------------\n");
-	printf("Stack1 after ra: \n");
-	ra(&head_stack1);
-	ft_print_content(head_stack1);
-	printf("Stack2 after ra: \n");
-	rb(&head_stack2);
-	ft_print_content(head_stack2);
-	printf("-------------------------\n");
-	printf("Stack1 after rra: \n");
-	rra(&head_stack1);
-	ft_print_content(head_stack1);
-	printf("Stack2 after rrb: \n");
-	rrb(&head_stack2);
-	ft_print_content(head_stack2); */
-// --------- TESTING
-    return (0);
+	
+	
+	printf("A:\n");
+	printf("------\n");
+ 	while(a)
+	{
+		printf("%d\n", a->value);
+		a = a->next;
+	}
+	printf("\n");
+	printf("B:\n");
+	printf("------\n");
+	while(b)
+	{
+		printf("%d\n", b->value);
+		b = b->next;
+	}
+	return (0);
 }

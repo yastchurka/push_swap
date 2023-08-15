@@ -1,12 +1,113 @@
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
+# include <stdlib.h>
+# include <limits.h>
+# include <stdbool.h>
+# include <unistd.h>
+# include <stdio.h>
 
 typedef struct node {
 	int			value;
+	int			index;
 	struct node	*next;
 	struct node	*prev;
 } nodek_t;
+
+/*
+ * Args at the command line are
+ * spaced separated strings
+*/
+static int	count_words(char *str, char separator)
+{
+	int		count;
+	bool	inside_word;
+
+	count = 0;
+	while (*str)
+	{
+		inside_word = false;
+		while (*str == separator)
+			++str;
+		while (*str != separator && *str)
+		{
+			if (!inside_word)
+			{
+				++count;
+				inside_word = true;
+			}
+			++str;
+		}
+	}
+	return (count);
+}
+
+/*
+ * I exploit static variables
+ * which are basically 
+ * "Global private variables"
+ * i can access it only via the get_next_word function
+*/
+static char	*get_next_word(char *str, char separator)
+{
+	static int	cursor = 0;
+	char		*next_str;
+	int			len;
+	int			i;
+
+	len = 0;
+	i = 0;
+	while (str[cursor] == separator)
+		++cursor;
+	while ((str[cursor + len] != separator) && str[cursor + len])
+		++len;
+	next_str = malloc((size_t)len * sizeof(char) + 1);
+	if (NULL == next_str)
+		return (NULL);
+	while ((str[cursor] != separator) && str[cursor])
+		next_str[i++] = str[cursor++];
+	next_str[i] = '\0';
+	return (next_str);
+}
+
+/*
+ * I recreate an argv in the HEAP
+ *
+ * +2 because i want to allocate space
+ * for the "\0" Placeholder and the final NULL
+ *
+ * vector_strings-->[p0]-> "\0" Placeholder to mimic argv
+ * 				 |->[p1]->"Hello"
+ * 				 |->[p2]->"how"
+ * 				 |->[p3]->"Are"
+ * 				 |->[..]->"..""
+ * 				 |->[NULL]
+*/
+char	**ft_split(char *str, char separator)
+{
+	int		words_number;
+	char	**vector_strings;
+	int		i;
+
+	i = 0;
+	words_number = count_words(str, separator);
+	if (!words_number)
+		exit(1);
+	vector_strings = malloc(sizeof(char *) * (size_t)(words_number + 2));
+	if (NULL == vector_strings)
+		return (NULL);
+	while (words_number-- >= 0)
+	{
+		if (0 == i)
+		{
+			vector_strings[i] = malloc(sizeof(char));
+			if (NULL == vector_strings[i])
+				return (NULL);
+			vector_strings[i++][0] = '\0';
+			continue ;
+		}
+		vector_strings[i++] = get_next_word(str, separator);
+	}
+	vector_strings[i] = NULL;
+	return (vector_strings);
+}
 
 int	small_atoi(char *str)
 {
@@ -35,6 +136,26 @@ int	small_atoi(char *str)
 	return (num * neg);
 }
 
+//SPLIT AND ATOI UPSTAIRS =======================
+
+int	len(struct node **stack)
+{
+	struct node	*temp;
+	int			i;
+
+	temp = *stack;
+	i = 0;
+	//fix error handling 
+	if (!stack)
+		return (0);
+	while (temp)
+	{
+		i++;
+		temp = temp->next;
+	}
+	return (i);
+}
+
 struct node *find_last_node(struct node *node)
 {
 	struct node	*temp;
@@ -59,6 +180,7 @@ void    append_node(struct node **stack, int nbr)
 		return ;
 	node->next = NULL;
 	node->value = nbr;
+	node->index = -1;
 	if (*stack == NULL)
 	{
 		*stack = node;
@@ -69,6 +191,44 @@ void    append_node(struct node **stack, int nbr)
 		last_node = find_last_node(*stack);
 		last_node->next = node;
 		node->prev = last_node;
+	}
+}
+
+struct node *get_next_min(struct node **stack_a)
+{
+	struct node	*temp;
+	struct node	*ptr;
+	int			flag;
+
+	temp = *stack_a;
+	ptr = temp;
+	flag = 0;
+	while (temp)
+	{
+		if (temp->index == -1 && (flag == 0 || temp->value < ptr->value))
+		{
+			ptr = temp;
+			flag = 1;
+		}
+		temp = temp->next;
+	}
+	return (ptr);
+}
+
+void   index_all(struct node **stack_a)
+{
+	struct node	*temp;
+	int			index;
+	int			i;
+
+	index = 0;
+	temp = *stack_a;
+	i = 0;
+	while (i < len(stack_a))
+	{
+		temp = get_next_min(stack_a);
+		temp->index = index++;
+		i++;
 	}
 }
 
@@ -87,6 +247,7 @@ void    initiate_stack(struct node **a, char *argv[])
 		append_node(a, nb);
 		i++;
 	}
+	index_all(a);
 }
 
 static void	push(struct node **stack_a, struct node **stack_b)
@@ -141,23 +302,6 @@ void	rotate(struct node **stack)
 	write(1, "ra\n", 3);
 }
 
-int	len(struct node **stack)
-{
-	struct node	*temp;
-	int			i;
-
-	temp = *stack;
-	i = 0;
-	//fix error handling 
-	if (!stack)
-		return (0);
-	while (temp)
-	{
-		i++;
-		temp = temp->next;
-	}
-	return (i);
-}
 
 static int	countBits(struct node **stack) 
 {
@@ -166,12 +310,12 @@ static int	countBits(struct node **stack)
 	int			bit_counter;
 
 	temp = *stack;
-	count = (*stack)->value;
+	count = (*stack)->index; //i
 	bit_counter = 0;
 	while (temp)
 	{
-		if (temp->value > count)
-			count = temp->value;
+		if (temp->index > count) //i
+			count = temp->index; //i
 		temp = temp->next;
 	}
 	while ((count >> bit_counter) != 0) 
@@ -197,7 +341,7 @@ void	radix_sort(struct node **stack_a, struct node **stack_b)
 		while (j < size)
 		{
 			head = *stack_a;
-			if (((head->value >> i) & 1 ) == 1)
+			if (((head->index >> i) & 1 ) == 1) //i
 				rotate(stack_a);
 			else
 				pb(stack_a, stack_b);
@@ -227,12 +371,12 @@ void	sorting(struct node **stack_a, struct node **stack_b, int argc)
 {
 	if (argc == 2)
 		rotate(stack_a);
-	if (argc == 3)
+	/* if (argc == 3)
 		sort_3(stack_a, stack_b);
 	if (argc == 3)
 		sort_4(stack_a, stack_b);
 	if (argc == 3)
-		sort_5(stack_a, stack_b);
+		sort_5(stack_a, stack_b); */
 	else
 		radix_sort(stack_a, stack_b);
 }
@@ -244,25 +388,25 @@ int	main(int argc, char *argv[])
 
 	a = NULL;
 	b = NULL;
-	if (argc == 1 || (argc == 2 && !argc[1][0]))
+	if (argc == 1 || (argc == 2 && !argv[1][0]))
 		return (1);
-	else if (argc == 2)
+	if (argc == 2)
+	{
+		argc = count_words(argv[1], ' ') + 1;
 		argv = ft_split(argv[1], ' ');
+	}
 	initiate_stack(&a, argv + 1);
 	if (is_sorted(&a) == 0)
-	{
-		sorting(&a, &b, argc);
-		return (0);
-	}
+		sorting(&a, &b, argc - 1);
 	//free_a
 	
 	
 	
-	printf("A:\n");
+	/* printf("A:\n");
 	printf("------\n");
  	while(a)
 	{
-		printf("%d\n", a->value);
+		printf("Liczba: %d o indexie: %d\n", a->value, a->index);
 		a = a->next;
 	}
 	printf("\n");
@@ -272,6 +416,6 @@ int	main(int argc, char *argv[])
 	{
 		printf("%d\n", b->value);
 		b = b->next;
-	}
+	} */
 	return (0);
 }

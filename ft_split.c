@@ -1,9 +1,5 @@
 #include "push_swap.h"
 
-/*
- * Args at the command line are
- * spaced separated strings
-*/
 static int	count_words(char *str, char separator)
 {
 	int		count;

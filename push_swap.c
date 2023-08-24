@@ -70,7 +70,7 @@ int	main(int argc, char *argv[])
 		sorting(&a, &b, argc - 1);
 	
 	////////////////////////////////////// no comments ////////////////////////////////////////////
-  	printf("A:\n");
+/*   	printf("A:\n");
 	printf("------\n");
  	while(a)
 	{
@@ -84,7 +84,7 @@ int	main(int argc, char *argv[])
 	{
 		printf("%d\n", b->value);
 		b = b->next;
-	}  
+	}   */
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
 	break_me_free(&a);

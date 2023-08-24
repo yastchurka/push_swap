@@ -1,6 +1,6 @@
 #include "push_swap.h"
 
-int bad_syntax(char *a)
+int	bad_syntax(char *a)
 {
 	if (!((*a >= '0' && *a <= '9') || *a == '-' || *a == '+'))
 		return (1);
@@ -12,40 +12,33 @@ int bad_syntax(char *a)
 	return (0);
 }
 
-void	free_stack(struct node **stack)
+int	check_for_duplicates(struct node **stack, int nb)
 {
-	struct node	*a;
-	struct node	*temp;
+	struct node	*t;
 
-	if (*stack == NULL)
-		return ;
-	a = *stack;
-	while (a)
+	t = *stack;
+	while (t)
 	{
-		temp = a->next;
-		free(a);
-		a = temp;
+		if (t->value == nb)
+			return (1);
+		t = t->next;
 	}
-	*stack = NULL;
+	return (0);
 }
 
-void	free_input(char **argv)
+/* int	check_for_overflows(char argv[])
 {
-	int	i;
+	long long	nb;
 
-	i = 0;
-	while(argv[i])
-	{
-		//free(argv[i]);
-		i++;
-	}
-	//free(argv);
-}
+	nb = small_atoi(argv);
+	if (nb >= -2147483648 && nb <= 2147483647)
+		return (0);
+	return (1);
+} */
 
-void	error(struct node **stack, char **argv)
+void	error(struct node **stack)
 {
-	free_stack(stack);
-	free_input(argv);
 	write(2, "Error\n", 6);
+	free_stack(stack);
 	exit(1);
 }

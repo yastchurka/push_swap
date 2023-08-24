@@ -1,10 +1,10 @@
 #include "push_swap.h"
 
-int	small_atoi(char *str)
+long	small_atoi(char *str)
 {
-	int neg;
-	int num;
-	int i;
+	int				neg;
+	unsigned long	num;
+	int				i;
 
 	i = 0;
 	neg = 1;
@@ -14,9 +14,7 @@ int	small_atoi(char *str)
 	if (str[i] == '-' || str[i] == '+')
 	{
 		if (str[i] == '-')
-		{
 			neg *= -1;
-		}
 		i++;
 	}
 	while (str[i] >= '0' && str[i] <= '9')

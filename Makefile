@@ -14,6 +14,7 @@ SRCS = freeing.c\
 		errors.c\
 		swap.c\
 		sort3.c\
+		radek_sort.c\
 
 OBJS = $(SRCS:.c=.o)
 

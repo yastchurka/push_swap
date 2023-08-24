@@ -28,23 +28,20 @@ void    append_node(struct node **stack, int nbr)
 
 void	initiate_stack(struct node **a, char *argv[])
 {
-	int	i;
-	int	nb;
+	int			i;
+	long long	nb;
 
 	i = 0;
 	nb = 0;
 	while (argv[i])
 	{
 		if (bad_syntax(argv[i]) == 1)
-		{
-			printf("The winner is: %c", *argv[i]);
-			error(a, argv);
-		}
+			error(a);
 		nb = small_atoi(argv[i]);
-		/* if (nbr > INT_MAX || nbr < INT_MIN)
-			error_free(a, argv);
-		if (error_repetition(*a, (int)nbr))
-			error_free(a, argv);  */
+ 		if (nb < -2147483648 || nb > 2147483647)
+			error(a);
+		if (check_for_duplicates(a, nb) == 1)
+			error(a);
 		append_node(a, nb);
 		i++;
 	}

@@ -43,12 +43,10 @@ void	sorting(struct node **stack_a, struct node **stack_b, int argc)
 	index_all(stack_a);
 	if (argc == 2)
 		rotate(stack_a);
-	if (argc == 3)
+	else if (argc == 3)
 		sort3(stack_a);
-	/* if (argc == 3)
-		sort_4(stack_a, stack_b);
-	if (argc == 3)
-		sort_5(stack_a, stack_b); */
+	else if (argc == 5)
+		radek_sort(stack_a, stack_b); 
 	else
 		radix_sort(stack_a, stack_b);
 }
@@ -70,9 +68,9 @@ int	main(int argc, char *argv[])
 	initiate_stack(&a, argv + 1);
 	if (is_sorted(&a) == 0)
 		sorting(&a, &b, argc - 1);
-		
+	
 	////////////////////////////////////// no comments ////////////////////////////////////////////
-/* 	printf("A:\n");
+  	printf("A:\n");
 	printf("------\n");
  	while(a)
 	{
@@ -86,10 +84,10 @@ int	main(int argc, char *argv[])
 	{
 		printf("%d\n", b->value);
 		b = b->next;
-	} */
+	}  
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
 	break_me_free(&a);
-	//break_me_free(&b);
+	break_me_free(&b);
 	return (0);
 }

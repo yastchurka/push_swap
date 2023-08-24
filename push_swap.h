@@ -1,6 +1,9 @@
 #ifndef PUSH_SWAP_H
 # define PUSH_SWAP_H
 
+# define MAX_INT 2147483647
+# define MIN_INT -2147483648
+
 # include <stdlib.h>
 # include <limits.h>
 # include <stdbool.h>
@@ -14,14 +17,11 @@ typedef struct node {
 	struct node	*prev;
 } nodek_t;
 
-//static int	count_words(char *str, char separator);
-//static int	countBits(struct node **stack);
-//static char	*get_next_word(char *str, char separator);
-char		**ft_split(char *str, char separator);
 int			is_sorted(struct node **stack_a);
 int			len(struct node **stack);
-int			small_atoi(char *str);
+long		small_atoi(char *str);
 int			bad_syntax(char *a);
+char		**ft_split(char *str, char separator);
 void		sorting(struct node **stack_a, struct node **stack_b, int argc);
 void		index_all(struct node **stack_a);
 void		append_node(struct node **stack, int nbr);
@@ -34,10 +34,12 @@ void		swap(struct node **stack);
 void		push(struct node **stack_a, struct node **stack_b);
 void		pa(struct node **a, struct node **b);
 void		pb(struct node **a, struct node **b);
-void		error(struct node **stack, char **argv);
+void		error(struct node **stack);
 void		sort3(struct node **stack_a);
+void		radek_sort(struct node **stack_a, struct node **stack_b);
+void		free_stack(struct node **stack);
+int		check_for_duplicates(struct node **stack, int nb);
 struct node	*get_next_min(struct node **stack_a);
 struct node *find_last_node(struct node *node);
-
 
 #endif

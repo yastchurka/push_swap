@@ -1,6 +1,6 @@
 #include "push_swap.h"
 
-struct node *get_next_min(struct node **stack_a)
+struct node	*get_next_min(struct node **stack_a)
 {
 	struct node	*temp;
 	struct node	*ptr;
@@ -21,7 +21,7 @@ struct node *get_next_min(struct node **stack_a)
 	return (ptr);
 }
 
-void   index_all(struct node **stack_a)
+void	index_all(struct node **stack_a)
 {
 	struct node	*temp;
 	int			index;
